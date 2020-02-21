@@ -11,100 +11,64 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.DependencyInjection
+namespace DurableTask.Hosting
 {
     using System;
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Contains all task hub instances of the given type.
     /// </summary>
-    /// <typeparam name="TObject">The type to track.</typeparam>
-    public class TaskHubCollection<TObject> : ITaskObjectCollection<TObject>
+    internal class TaskHubCollection : ITaskObjectCollection
     {
-        private readonly HashSet<Type> types = new HashSet<Type>();
+        private readonly HashSet<TaskHubDescriptor> descriptors = new HashSet<TaskHubDescriptor>();
         private readonly ConcurrentDictionary<TaskVersion, Type> typeMap
             = new ConcurrentDictionary<TaskVersion, Type>();
 
-        private IServiceCollection serviceDescriptors;
+        /// <inheritdoc />
+        public Type this[string taskName, string taskVersion] => GetTaskType(taskName, taskVersion);
+
+        /// <inheritdoc />
+        public int Count => this.descriptors.Count;
+
+        /// <inheritdoc />
+        public IEnumerator<TaskHubDescriptor> GetEnumerator() => this.descriptors.GetEnumerator();
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>
-        /// Initializes a new instance of <see cref="TaskHubCollection{TService}"/>.
-        /// Takes a one-time snapshow of <paramref name="serviceDescriptors"/> on first access,
-        /// then de-references it.
+        /// Adds the descriptor to this collection.
         /// </summary>
-        /// <param name="serviceDescriptors"></param>
-        public TaskHubCollection(IServiceCollection serviceDescriptors)
+        /// <param name="descriptor">The descriptor to add.</param>
+        public bool Add(TaskHubDescriptor descriptor) => this.descriptors.Add(descriptor);
+
+        private bool IsTaskMatch(string name, string version, TaskHubDescriptor descriptor)
         {
-            this.serviceDescriptors = serviceDescriptors ?? throw new ArgumentNullException(nameof(serviceDescriptors));
+            return string.Equals(name, descriptor.Name, StringComparison.Ordinal)
+                && string.Equals(version, descriptor.Version, StringComparison.Ordinal);
         }
 
-        /// <inheritdoc />
-        public Type this[string taskName, string taskVersion] => throw new NotImplementedException();
-
-        /// <inheritdoc />
-        public int Count => this.Types.Count;
-
-        private HashSet<Type> Types
+        private Type GetTaskType(string name, string version)
         {
-            get
-            {
-                Initialize();
-                return this.types;
-            }
-        }
-
-        /// <inheritdoc />
-        public IEnumerator<Task> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        private Type GetTaskType(TaskVersion taskVersion)
-        {
+            var taskVersion = new TaskVersion(name, version);
             if (this.typeMap.TryGetValue(taskVersion, out Type type))
             {
                 return type;
             }
 
-            foreach (Type taskType in Types)
+            foreach (TaskHubDescriptor descriptor in descriptors)
             {
-
-            }
-        }
-
-        private void Initialize()
-        {
-            if (this.serviceDescriptors == null)
-            {
-                return;
-            }
-
-            lock (types)
-            {
-                if (this.serviceDescriptors == null)
+                if (IsTaskMatch(name, version, descriptor))
                 {
-                    return;
+                    this.typeMap.TryAdd(taskVersion, descriptor.Type);
+                    return descriptor.Type;
                 }
-
-                IEnumerable<Type> types = serviceDescriptors
-                    .Where(sd => typeof(TObject).IsAssignableFrom(sd.ServiceType))
-                    .Select(sd => sd.GetImplementationType());
-
-                this.types.UnionWith(types);
-                this.serviceDescriptors = null;
             }
+
+            return null;
         }
 
         private readonly struct TaskVersion : IEquatable<TaskVersion>

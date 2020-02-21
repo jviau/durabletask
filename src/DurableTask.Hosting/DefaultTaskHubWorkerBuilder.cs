@@ -22,13 +22,16 @@ namespace DurableTask.Hosting
     /// </summary>
     public class DefaultTaskHubWorkerBuilder : ITaskHubWorkerBuilder
     {
+        private readonly TaskHubCollection orchestrations = new TaskHubCollection();
+        private readonly TaskHubCollection activities = new TaskHubCollection();
+
         /// <summary>
         /// Initializes a new instance of <see cref="DefaultTaskHubWorkerBuilder"/>.
         /// </summary>
         /// <param name="services">The current service collection, not null.</param>
         public DefaultTaskHubWorkerBuilder(IServiceCollection services)
         {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
+            this.Services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         /// <inheritdoc />
@@ -38,5 +41,33 @@ namespace DurableTask.Hosting
         /// Gets or sets the current orchestration service.
         /// </summary>
         public IOrchestrationService OrchestrationService { get; set; }
+
+        /// <inheritdoc />
+        public ITaskHubWorkerBuilder AddActivity(TaskActivityDescriptor descriptor)
+        {
+            AddService(descriptor);
+            this.activities.Add(descriptor);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ITaskHubWorkerBuilder AddOrchestration(TaskOrchestrationDescriptor descriptor)
+        {
+            AddService(descriptor);
+            this.orchestrations.Add(descriptor);
+            return this;
+        }
+
+        private void AddService(TaskHubDescriptor descriptor)
+        {
+            if (descriptor.Creator != null)
+            {
+                this.Services.AddTransient(descriptor.Type, descriptor.Creator);
+            }
+            else
+            {
+                this.Services.AddTransient(descriptor.Type);
+            }
+        }
     }
 }

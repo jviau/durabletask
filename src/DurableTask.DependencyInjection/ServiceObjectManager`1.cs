@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using DurableTask.Core;
 
 namespace DurableTask.DependencyInjection
@@ -11,15 +9,13 @@ namespace DurableTask.DependencyInjection
     /// <typeparam name="TObject"></typeparam>
     public class ServiceObjectManager<TObject> : INameVersionObjectManager<TObject>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="creator"></param>
+        /// <inheritdoc />
         public void Add(ObjectCreator<TObject> creator)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public TObject GetObject(string name, string version)
         {
             throw new NotImplementedException();

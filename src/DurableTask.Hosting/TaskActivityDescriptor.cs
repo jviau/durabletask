@@ -14,38 +14,20 @@
 namespace DurableTask.Hosting
 {
     using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using DurableTask.Core;
-    using Microsoft.Extensions.Hosting;
 
     /// <summary>
-    /// A dotnet hosted service for <see cref="TaskHubWorker"/>.
+    /// A descriptor for <see cref="TaskActivity"/>.
     /// </summary>
-    public class TaskHubBackgroundService : BackgroundService
+    public class TaskActivityDescriptor : TaskHubDescriptor
     {
-        private readonly TaskHubWorker _worker;
-
         /// <summary>
-        /// Initializes a new instance of <see cref="TaskHubBackgroundService"/>.
+        /// Initializes a new instance of <see cref="TaskActivityDescriptor"/>.
         /// </summary>
-        /// <param name="worker">The task hub worker.</param>
-        public TaskHubBackgroundService(TaskHubWorker worker)
+        /// <param name="type">The type of activity to describe.</param>
+        internal TaskActivityDescriptor(Type type)
+            : base(type)
         {
-            _worker = worker ?? throw new ArgumentNullException(nameof(worker));
-        }
-
-        /// <inheritdoc />
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await _worker.StopAsync();
-            await base.StopAsync(cancellationToken);
-        }
-
-        /// <inheritdoc />
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            return _worker.StartAsync();
         }
     }
 }

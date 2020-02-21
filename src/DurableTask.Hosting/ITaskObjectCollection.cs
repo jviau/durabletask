@@ -13,30 +13,17 @@
 
 namespace DurableTask.Hosting
 {
-    using Microsoft.Extensions.DependencyInjection;
+    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// A builder for hosting a durable task worker.
+    /// The collection of task types.
     /// </summary>
-    public interface ITaskHubWorkerBuilder
+    internal interface ITaskObjectCollection : IReadOnlyCollection<TaskHubDescriptor>
     {
         /// <summary>
-        /// Gets the <see cref="IServiceCollection"/> where durable task services are configured.
+        /// Gets the task object identified by <paramref name="taskName"/> and <paramref name="taskVersion"/>.
         /// </summary>
-        IServiceCollection Services { get; }
-
-        /// <summary>
-        /// Adds the provided descriptor of an activity to the builder.
-        /// </summary>
-        /// <param name="descriptor">The activity descriptor to add.</param>
-        /// <returns></returns>
-        ITaskHubWorkerBuilder AddActivity(TaskActivityDescriptor descriptor);
-
-        /// <summary>
-        /// Adds the provided descriptor to the builder.
-        /// </summary>
-        /// <param name="descriptor">The descriptor to add.</param>
-        /// <returns></returns>
-        ITaskHubWorkerBuilder AddOrchestration(TaskOrchestrationDescriptor descriptor);
+        Type this[string taskName, string taskVersion] { get; }
     }
 }
