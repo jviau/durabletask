@@ -11,23 +11,25 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
+    using DurableTask.Core;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Helpers for assertions.
+    /// A descriptor for <see cref="TaskActivity"/>.
     /// </summary>
-    internal static class Check
+    public class TaskActivityDescriptor : TaskHubDescriptor
     {
-        public static T NotNull<T>(T t, string name)
+        /// <summary>
+        /// Initializes a new instance of <see cref="TaskActivityDescriptor"/>.
+        /// </summary>
+        /// <param name="type">The type of activity to describe.</param>
+        /// <param name="descriptor">The service descriptor.</param>
+        internal TaskActivityDescriptor(Type type, ServiceDescriptor descriptor)
+            : base(type, descriptor)
         {
-            if (t == null)
-            {
-                throw new ArgumentNullException(name);
-            }
-
-            return t;
         }
     }
 }

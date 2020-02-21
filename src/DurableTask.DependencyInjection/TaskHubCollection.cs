@@ -11,7 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
     using System.Collections;

@@ -11,23 +11,23 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
     using DurableTask.Core;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Describes a task hub activity or orchestration.
     /// </summary>
-    public abstract class TaskHubDescriptor
+    public abstract class TaskHubDescriptor : ServiceDescriptorWrapper
     {
         private string name;
         private string version;
 
-        internal TaskHubDescriptor(Type type)
+        internal TaskHubDescriptor(Type type, ServiceDescriptor descriptor)
+            : base(type, descriptor)
         {
-            Check.NotNull(type, nameof(type));
-            this.Type = type;
         }
 
         /// <summary>
@@ -63,21 +63,15 @@ namespace DurableTask.Hosting
         }
 
         /// <summary>
-        /// Gets the task type.
-        /// </summary>
-        public Type Type { get; }
-
-        internal Func<IServiceProvider, object> Creator { get; set; }
-
-        /// <summary>
         /// Creates a new <see cref="TaskOrchestrationDescriptor"/>.
         /// </summary>
         /// <param name="type">The type of the task.</param>
         /// <returns>A new task hub descriptor.</returns>
         public static TaskOrchestrationDescriptor Orchestration(Type type)
         {
-            VerifyType<TaskOrchestration>(type);
-            return new TaskOrchestrationDescriptor(type);
+            Check.NotNull(type, nameof(type));
+            Check.ConcreteType<TaskOrchestration>(type, nameof(type));
+            return new TaskOrchestrationDescriptor(type, ServiceDescriptor.Transient(type, type));
         }
 
         /// <summary>
@@ -98,12 +92,10 @@ namespace DurableTask.Hosting
         /// <returns>A new task hub descriptor.</returns>
         public static TaskOrchestrationDescriptor Orchestration(string name, string version, Type type)
         {
-            VerifyType<TaskOrchestration>(type);
-            return new TaskOrchestrationDescriptor(type)
-            {
-                Name = name,
-                Version = version,
-            };
+            TaskOrchestrationDescriptor descriptor = Orchestration(type);
+            descriptor.Name = name;
+            descriptor.Version = version;
+            return descriptor;
         }
 
         /// <summary>
@@ -120,16 +112,13 @@ namespace DurableTask.Hosting
         /// <summary>
         /// Creates a new <see cref="TaskOrchestrationDescriptor"/>.
         /// </summary>
-        /// <param name="creator">The delegate to create the task instance.</param>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
-        public static TaskOrchestrationDescriptor Orchestration<TOrchestration>(Func<IServiceProvider, TOrchestration> creator)
+        public static TaskOrchestrationDescriptor Orchestration<TOrchestration>(Func<IServiceProvider, TOrchestration> factory)
             where TOrchestration : TaskOrchestration
         {
-            VerifyType<TaskOrchestration>(typeof(TOrchestration));
-            return new TaskOrchestrationDescriptor(typeof(TOrchestration))
-            {
-                Creator = creator,
-            };
+            Check.ConcreteType<TaskOrchestration>(typeof(TOrchestration), nameof(TOrchestration));
+            return new TaskOrchestrationDescriptor(typeof(TOrchestration), ServiceDescriptor.Transient(factory));
         }
 
         /// <summary>
@@ -137,19 +126,16 @@ namespace DurableTask.Hosting
         /// </summary>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="creator">The delegate to create the task instance.</param>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
         public static TaskOrchestrationDescriptor Orchestration<TOrchestration>(
-            string name, string version, Func<IServiceProvider, TOrchestration> creator)
+            string name, string version, Func<IServiceProvider, TOrchestration> factory)
             where TOrchestration : TaskOrchestration
         {
-            VerifyType<TaskOrchestration>(typeof(TOrchestration));
-            return new TaskOrchestrationDescriptor(typeof(TOrchestration))
-            {
-                Name = name,
-                Version = version,
-                Creator = creator,
-            };
+            TaskOrchestrationDescriptor descriptor = Orchestration(factory);
+            descriptor.Name = name;
+            descriptor.Version = version;
+            return descriptor;
         }
 
         /// <summary>
@@ -159,8 +145,9 @@ namespace DurableTask.Hosting
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Activity(Type type)
         {
-            VerifyType<TaskActivity>(type);
-            return new TaskActivityDescriptor(type);
+            Check.NotNull(type, nameof(type));
+            Check.ConcreteType<TaskActivity>(type, nameof(type));
+            return new TaskActivityDescriptor(type, ServiceDescriptor.Transient(type, type));
         }
 
         /// <summary>
@@ -181,12 +168,10 @@ namespace DurableTask.Hosting
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Activity(string name, string version, Type type)
         {
-            VerifyType<TaskActivity>(type);
-            return new TaskActivityDescriptor(type)
-            {
-                Name = name,
-                Version = version,
-            };
+            TaskActivityDescriptor descriptor = Activity(type);
+            descriptor.Name = name;
+            descriptor.Version = version;
+            return descriptor;
         }
 
         /// <summary>
@@ -203,16 +188,13 @@ namespace DurableTask.Hosting
         /// <summary>
         /// Creates a new <see cref="TaskActivityDescriptor"/>.
         /// </summary>
-        /// <param name="creator">The delegate to create the task instance.</param>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
-        public static TaskActivityDescriptor Activity<TActivity>(Func<IServiceProvider, TActivity> creator)
+        public static TaskActivityDescriptor Activity<TActivity>(Func<IServiceProvider, TActivity> factory)
             where TActivity : TaskActivity
         {
-            VerifyType<TaskActivity>(typeof(TActivity));
-            return new TaskActivityDescriptor(typeof(TActivity))
-            {
-                Creator = creator,
-            };
+            Check.ConcreteType<TaskActivity>(typeof(TActivity), nameof(TActivity));
+            return new TaskActivityDescriptor(typeof(TActivity), ServiceDescriptor.Transient(factory));
         }
 
         /// <summary>
@@ -220,19 +202,16 @@ namespace DurableTask.Hosting
         /// </summary>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="creator">The delegate to create the task instance.</param>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Activity<TActivity>(
-            string name, string version, Func<IServiceProvider, TActivity> creator)
+            string name, string version, Func<IServiceProvider, TActivity> factory)
             where TActivity : TaskActivity
         {
-            VerifyType<TaskActivity>(typeof(TActivity));
-            return new TaskActivityDescriptor(typeof(TActivity))
-            {
-                Name = name,
-                Version = version,
-                Creator = creator,
-            };
+            TaskActivityDescriptor descriptor = Activity(factory);
+            descriptor.Name = name;
+            descriptor.Version = version;
+            return descriptor;
         }
 
         private void Initialize()
@@ -245,16 +224,6 @@ namespace DurableTask.Hosting
             if (this.version == null)
             {
                 this.version = NameVersionHelper.GetDefaultVersion(this.Type);
-            }
-        }
-
-        private static void VerifyType<TExpected>(Type type)
-        {
-            Check.NotNull(type, nameof(type));
-            if (!typeof(TExpected).IsAssignableFrom(type) || !type.IsClass || type.IsAbstract)
-            {
-                throw new ArgumentException(
-                    $"Task hub type {type} must inherit from {typeof(TExpected)}, be a class, and not be abstract");
             }
         }
     }

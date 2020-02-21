@@ -11,22 +11,24 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
     using DurableTask.Core;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// A descriptor for <see cref="TaskActivity"/>.
+    /// A descriptor for <see cref="TaskOrchestration"/>.
     /// </summary>
-    public class TaskActivityDescriptor : TaskHubDescriptor
+    public class TaskOrchestrationDescriptor : TaskHubDescriptor
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="TaskActivityDescriptor"/>.
+        /// Initializes a new instance of <see cref="TaskOrchestrationDescriptor"/>.
         /// </summary>
-        /// <param name="type">The type of activity to describe.</param>
-        internal TaskActivityDescriptor(Type type)
-            : base(type)
+        /// <param name="type">The type of orchestration to describe.</param>
+        /// <param name="descriptor">The service descriptor.</param>
+        internal TaskOrchestrationDescriptor(Type type, ServiceDescriptor descriptor)
+            : base(type, descriptor)
         {
         }
     }

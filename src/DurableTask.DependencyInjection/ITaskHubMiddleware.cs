@@ -11,23 +11,23 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
-    using DurableTask.Core;
+    using System.Threading.Tasks;
+    using DurableTask.Core.Middleware;
 
     /// <summary>
-    /// A descriptor for <see cref="TaskOrchestration"/>.
+    /// Middleware for running in the task hub worker pipeline.
     /// </summary>
-    public class TaskOrchestrationDescriptor : TaskHubDescriptor
+    public interface ITaskHubMiddleware
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="TaskOrchestrationDescriptor"/>.
+        /// Task hub middleware handling method.
         /// </summary>
-        /// <param name="type">The type of orchestration to describe.</param>
-        internal TaskOrchestrationDescriptor(Type type)
-            : base(type)
-        {
-        }
+        /// <param name="context">The <see cref="DispatchMiddlewareContext"/> context for this pipeline.</param>
+        /// <param name="next">The delegate representing the remaining middleware in the pipeline.</param>
+        /// <returns>A <see cref="Task"/> that represents the execution of this middleware.</returns>
+        Task InvokeAsync(DispatchMiddlewareContext context, Func<Task> next);
     }
 }

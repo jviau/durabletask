@@ -11,19 +11,33 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
     using System;
-    using System.Collections.Generic;
 
     /// <summary>
-    /// The collection of task types.
+    /// Helpers for assertions.
     /// </summary>
-    internal interface ITaskObjectCollection : IReadOnlyCollection<TaskHubDescriptor>
+    internal static class Check
     {
-        /// <summary>
-        /// Gets the task object identified by <paramref name="taskName"/> and <paramref name="taskVersion"/>.
-        /// </summary>
-        Type this[string taskName, string taskVersion] { get; }
+        public static T NotNull<T>(T t, string name)
+        {
+            if (t == null)
+            {
+                throw new ArgumentNullException(name);
+            }
+
+            return t;
+        }
+
+        public static void ConcreteType<TImplements>(Type type, string argument)
+        {
+            NotNull(type, argument);
+            if (!typeof(TImplements).IsAssignableFrom(type) || !type.IsClass || type.IsAbstract)
+            {
+                throw new ArgumentException(
+                    $"Type parameter {argument} [{type}] must inherit from {typeof(TImplements)}, be a class, and not be abstract");
+            }
+        }
     }
 }

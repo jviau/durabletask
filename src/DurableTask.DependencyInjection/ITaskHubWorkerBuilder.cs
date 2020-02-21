@@ -11,8 +11,9 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.Hosting
+namespace DurableTask.DependencyInjection
 {
+    using DurableTask.Core;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -26,17 +27,37 @@ namespace DurableTask.Hosting
         IServiceCollection Services { get; }
 
         /// <summary>
+        /// Gets or sets the <see cref="IOrchestrationService"/> to use.
+        /// </summary>
+        IOrchestrationService OrchestrationService { get; set; }
+
+        /// <summary>
         /// Adds the provided descriptor of an activity to the builder.
         /// </summary>
         /// <param name="descriptor">The activity descriptor to add.</param>
-        /// <returns></returns>
+        /// <returns>This instance, for chaining calls</returns>
         ITaskHubWorkerBuilder AddActivity(TaskActivityDescriptor descriptor);
+
+        /// <summary>
+        /// Adds the provided middleware for task activities.
+        /// </summary>
+        /// <param name="descriptor">The middleware descriptor to add.</param>
+        /// <returns>This instance, for chaining calls</returns>
+        ITaskHubWorkerBuilder AddActivityMiddleware(TaskHubMiddlewareDescriptor descriptor);
 
         /// <summary>
         /// Adds the provided descriptor to the builder.
         /// </summary>
         /// <param name="descriptor">The descriptor to add.</param>
-        /// <returns></returns>
+        /// <returns>This instance, for chaining calls</returns>
         ITaskHubWorkerBuilder AddOrchestration(TaskOrchestrationDescriptor descriptor);
+
+        /// <summary>
+        /// Adds the provided middleware for task orchestrations.
+        /// </summary>
+        /// <param name="descriptor">The middleware descriptor to add.</param>
+        /// <returns>This instance, for chaining calls</returns>
+        ITaskHubWorkerBuilder AddOrchestrationMiddleware(TaskHubMiddlewareDescriptor descriptor);
+
     }
 }
