@@ -57,7 +57,7 @@ namespace DurableTask.DependencyInjection
         }
 
         /// <inheritdoc />
-        public ITaskHubWorkerBuilder AddActivityMiddleware(TaskHubMiddlewareDescriptor descriptor)
+        public ITaskHubWorkerBuilder AddActivityMiddleware(TaskMiddlewareDescriptor descriptor)
         {
             Check.NotNull(descriptor, nameof(descriptor));
 
@@ -75,7 +75,7 @@ namespace DurableTask.DependencyInjection
         }
 
         /// <inheritdoc />
-        public ITaskHubWorkerBuilder AddOrchestrationMiddleware(TaskHubMiddlewareDescriptor descriptor)
+        public ITaskHubWorkerBuilder AddOrchestrationMiddleware(TaskMiddlewareDescriptor descriptor)
         {
             Check.NotNull(descriptor, nameof(descriptor));
 

@@ -20,108 +20,108 @@ namespace DurableTask.DependencyInjection.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class TaskHubMiddlewareDescriptorTests
+    public class TaskMiddlewareDescriptorTests
     {
         [TestMethod]
         public void SingletonByType()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Singleton(typeof(TestMiddleware)),
+                () => TaskMiddlewareDescriptor.Singleton(typeof(TestMiddleware)),
                 ServiceLifetime.Singleton);
 
         [TestMethod]
         public void SingleByTypeNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskHubMiddlewareDescriptor.Singleton((Type)null));
+                () => TaskMiddlewareDescriptor.Singleton((Type)null));
 
         [TestMethod]
         public void SingleByTypeAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Singleton(typeof(AbstractMiddleware)));
+                () => TaskMiddlewareDescriptor.Singleton(typeof(AbstractMiddleware)));
 
         [TestMethod]
-        public void SingletonByTypeParam()
+        public void SingletonByGeneric()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Singleton<TestMiddleware>(),
+                () => TaskMiddlewareDescriptor.Singleton<TestMiddleware>(),
                 ServiceLifetime.Singleton);
 
         [TestMethod]
-        public void SingleByTypeParamAbstract()
+        public void SingleByGenericAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Singleton<AbstractMiddleware>());
+                () => TaskMiddlewareDescriptor.Singleton<AbstractMiddleware>());
 
         [TestMethod]
         public void SingletonByInstance()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Singleton(new TestMiddleware()),
+                () => TaskMiddlewareDescriptor.Singleton(new TestMiddleware()),
                 ServiceLifetime.Singleton);
 
         [TestMethod]
         public void SingleByInstanceNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskHubMiddlewareDescriptor.Singleton((ITaskHubMiddleware)null));
+                () => TaskMiddlewareDescriptor.Singleton((ITaskHubMiddleware)null));
 
         [TestMethod]
         public void SingletonByFactory()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Singleton(_ => new TestMiddleware()),
+                () => TaskMiddlewareDescriptor.Singleton(_ => new TestMiddleware()),
                 ServiceLifetime.Singleton);
 
         [TestMethod]
         public void SingleByFactoryNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskHubMiddlewareDescriptor.Singleton((Func<IServiceProvider, ITaskHubMiddleware>)null));
+                () => TaskMiddlewareDescriptor.Singleton((Func<IServiceProvider, ITaskHubMiddleware>)null));
 
         [TestMethod]
         public void SingleByFactoryAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Singleton(_ => new TestMiddleware() as AbstractMiddleware));
+                () => TaskMiddlewareDescriptor.Singleton(_ => new TestMiddleware() as AbstractMiddleware));
 
         [TestMethod]
         public void TransientByType()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Transient(typeof(TestMiddleware)),
+                () => TaskMiddlewareDescriptor.Transient(typeof(TestMiddleware)),
                 ServiceLifetime.Transient);
 
         [TestMethod]
         public void TransientByTypeNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskHubMiddlewareDescriptor.Transient((Type)null));
+                () => TaskMiddlewareDescriptor.Transient((Type)null));
 
         [TestMethod]
         public void TransientByTypeAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Transient(typeof(AbstractMiddleware)));
+                () => TaskMiddlewareDescriptor.Transient(typeof(AbstractMiddleware)));
 
         [TestMethod]
-        public void TransientByTypeParam()
+        public void TransientByGeneric()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Transient<TestMiddleware>(),
+                () => TaskMiddlewareDescriptor.Transient<TestMiddleware>(),
                 ServiceLifetime.Transient);
 
         [TestMethod]
-        public void TransientByTypeParamAbstract()
+        public void TransientByGenericAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Transient<AbstractMiddleware>());
+                () => TaskMiddlewareDescriptor.Transient<AbstractMiddleware>());
 
         [TestMethod]
         public void TransientByFactory()
             => RunTest<TestMiddleware>(
-                () => TaskHubMiddlewareDescriptor.Transient(_ => new TestMiddleware()),
+                () => TaskMiddlewareDescriptor.Transient(_ => new TestMiddleware()),
                 ServiceLifetime.Transient);
 
         [TestMethod]
         public void TransientByFactoryNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskHubMiddlewareDescriptor.Transient((Func<IServiceProvider, ITaskHubMiddleware>)null));
+                () => TaskMiddlewareDescriptor.Transient((Func<IServiceProvider, ITaskHubMiddleware>)null));
 
         [TestMethod]
         public void TransientByFactoryAbstract()
             => RunExceptionTest<ArgumentException>(
-                () => TaskHubMiddlewareDescriptor.Transient(_ => new TestMiddleware() as AbstractMiddleware));
+                () => TaskMiddlewareDescriptor.Transient(_ => new TestMiddleware() as AbstractMiddleware));
 
-        private void RunTest<TMiddleware>(Func<TaskHubMiddlewareDescriptor> test, ServiceLifetime serviceLifetime)
+        private void RunTest<TMiddleware>(Func<TaskMiddlewareDescriptor> test, ServiceLifetime serviceLifetime)
         {
-            TaskHubMiddlewareDescriptor descriptor = test();
+            TaskMiddlewareDescriptor descriptor = test();
 
             Assert.IsNotNull(descriptor);
             Assert.AreEqual(typeof(TMiddleware), descriptor.Type);
@@ -129,12 +129,12 @@ namespace DurableTask.DependencyInjection.Tests
             Assert.AreEqual(serviceLifetime, descriptor.Descriptor.Lifetime);
         }
 
-        private void RunExceptionTest<TException>(Func<TaskHubMiddlewareDescriptor> test)
+        private void RunExceptionTest<TException>(Func<TaskMiddlewareDescriptor> test)
             where TException : Exception
         {
             try
             {
-                TaskHubMiddlewareDescriptor descriptor = test();
+                TaskMiddlewareDescriptor descriptor = test();
             }
             catch (TException)
             {
@@ -152,6 +152,5 @@ namespace DurableTask.DependencyInjection.Tests
                 throw new NotImplementedException();
             }
         }
-
     }
 }

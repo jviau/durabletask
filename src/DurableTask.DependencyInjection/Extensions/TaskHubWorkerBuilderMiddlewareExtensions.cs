@@ -11,17 +11,17 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using System;
-
 namespace DurableTask.DependencyInjection
 {
+    using System;
+
     /// <summary>
     /// Extensions for <see cref="ITaskHubWorkerBuilder"/>.
     /// </summary>
     public static class TaskHubWorkerBuilderMiddlewareExtensions
     {
         /// <summary>
-        /// Adds the provided middleware to the activity pipeline.
+        /// Adds the provided middleware to the activity pipeline as a singleton service.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="middleware">The middleware instance to add.</param>
@@ -30,11 +30,11 @@ namespace DurableTask.DependencyInjection
             this ITaskHubWorkerBuilder builder, ITaskHubMiddleware middleware)
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddActivityMiddleware(TaskHubMiddlewareDescriptor.Singleton(middleware));
+            return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Singleton(middleware));
         }
 
         /// <summary>
-        /// Adds the provided middleware to the activity pipeline.
+        /// Adds the provided middleware to the activity pipeline as a transient service.
         /// </summary>
         /// <typeparam name="TMiddleware">The type of middleware to add.</typeparam>
         /// <param name="builder">The builder to add to.</param>
@@ -43,11 +43,11 @@ namespace DurableTask.DependencyInjection
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddActivityMiddleware(TaskHubMiddlewareDescriptor.Transient<TMiddleware>());
+            return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Transient<TMiddleware>());
         }
 
         /// <summary>
-        /// Adds the provided middleware to the activity pipeline.
+        /// Adds the provided middleware to the activity pipeline as a transient service.
         /// </summary>
         /// <typeparam name="TMiddleware">The type of middleware to add.</typeparam>
         /// <param name="builder">The builder to add to.</param>
@@ -58,11 +58,11 @@ namespace DurableTask.DependencyInjection
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddActivityMiddleware(TaskHubMiddlewareDescriptor.Transient(factory));
+            return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Transient(factory));
         }
 
         /// <summary>
-        /// Adds the provided middleware to the orchestration pipeline.
+        /// Adds the provided middleware to the orchestration pipeline as a singleton service.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="middleware">The middleware instance to add.</param>
@@ -71,11 +71,11 @@ namespace DurableTask.DependencyInjection
             this ITaskHubWorkerBuilder builder, ITaskHubMiddleware middleware)
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddOrchestrationMiddleware(TaskHubMiddlewareDescriptor.Singleton(middleware));
+            return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Singleton(middleware));
         }
 
         /// <summary>
-        /// Adds the provided middleware to the orchestration pipeline.
+        /// Adds the provided middleware to the orchestration pipeline as a transient service.
         /// </summary>
         /// <typeparam name="TMiddleware">The type of middleware to add.</typeparam>
         /// <param name="builder">The builder to add to.</param>
@@ -84,11 +84,11 @@ namespace DurableTask.DependencyInjection
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddOrchestrationMiddleware(TaskHubMiddlewareDescriptor.Transient<TMiddleware>());
+            return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Transient<TMiddleware>());
         }
 
         /// <summary>
-        /// Adds the provided middleware to the orchestration pipeline.
+        /// Adds the provided middleware to the orchestration pipeline as a transient service.
         /// </summary>
         /// <typeparam name="TMiddleware">The type of middleware to add.</typeparam>
         /// <param name="builder">The builder to add to.</param>
@@ -99,7 +99,7 @@ namespace DurableTask.DependencyInjection
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(builder, nameof(builder));
-            return builder.AddOrchestrationMiddleware(TaskHubMiddlewareDescriptor.Transient(factory));
+            return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Transient(factory));
         }
     }
 }

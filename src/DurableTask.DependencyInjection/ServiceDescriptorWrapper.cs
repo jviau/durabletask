@@ -24,14 +24,14 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Initializes a new instance of <see cref="ServiceDescriptorWrapper"/>.
         /// </summary>
-        /// <param name="implementationType"></param>
-        /// <param name="descriptor"></param>
-        internal ServiceDescriptorWrapper(Type implementationType, ServiceDescriptor descriptor)
+        /// <param name="type">The service type.</param>
+        /// <param name="descriptor">The service descriptor.</param>
+        protected ServiceDescriptorWrapper(Type type, ServiceDescriptor descriptor)
         {
-            Check.NotNull(implementationType, nameof(implementationType));
+            Check.NotNull(type, nameof(type));
             Check.NotNull(descriptor, nameof(descriptor));
 
-            this.Type = implementationType;
+            this.Type = type;
             this.Descriptor = descriptor;
         }
 

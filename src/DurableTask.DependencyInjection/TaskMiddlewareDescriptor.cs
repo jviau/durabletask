@@ -19,9 +19,9 @@ namespace DurableTask.DependencyInjection
     /// <summary>
     /// A descriptor wrapper for <see cref="ITaskHubMiddleware"/>.
     /// </summary>
-    public sealed class TaskHubMiddlewareDescriptor : ServiceDescriptorWrapper
+    public sealed class TaskMiddlewareDescriptor : ServiceDescriptorWrapper
     {
-        private TaskHubMiddlewareDescriptor(Type implementationType, ServiceDescriptor descriptor)
+        private TaskMiddlewareDescriptor(Type implementationType, ServiceDescriptor descriptor)
             : base(implementationType, descriptor)
         {
         }
@@ -31,12 +31,12 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="type">The concrete <see cref="ITaskHubMiddleware"/> type.</param>
         /// <returns>A descriptor for a singleton taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Singleton(Type type)
+        public static TaskMiddlewareDescriptor Singleton(Type type)
         {
             Check.NotNull(type, nameof(type));
             Check.ConcreteType<ITaskHubMiddleware>(type, nameof(type));
 
-            return new TaskHubMiddlewareDescriptor(type, ServiceDescriptor.Singleton(type));
+            return new TaskMiddlewareDescriptor(type, ServiceDescriptor.Singleton(type));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <typeparam name="TMiddleware">The concrete <see cref="ITaskHubMiddleware"/> type.</typeparam>
         /// <returns>A descriptor for a singleton taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Singleton<TMiddleware>()
+        public static TaskMiddlewareDescriptor Singleton<TMiddleware>()
             where TMiddleware : class, ITaskHubMiddleware
             => Singleton(typeof(TMiddleware));
 
@@ -53,12 +53,12 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="instance">The implementation instance.</param>
         /// <returns>A descriptor for a singleton taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Singleton(ITaskHubMiddleware instance)
+        public static TaskMiddlewareDescriptor Singleton(ITaskHubMiddleware instance)
         {
             Check.NotNull(instance, nameof(instance));
             Check.ConcreteType<ITaskHubMiddleware>(instance.GetType(), nameof(instance));
 
-            return new TaskHubMiddlewareDescriptor(
+            return new TaskMiddlewareDescriptor(
                 instance.GetType(), ServiceDescriptor.Singleton(instance.GetType(), instance));
         }
 
@@ -67,13 +67,13 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="factory">The factory to produce the singleton middleware.</param>
         /// <returns>A descriptor for a singleton taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Singleton<TMiddleware>(Func<IServiceProvider, TMiddleware> factory)
+        public static TaskMiddlewareDescriptor Singleton<TMiddleware>(Func<IServiceProvider, TMiddleware> factory)
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(factory, nameof(factory));
             Check.ConcreteType<ITaskHubMiddleware>(typeof(TMiddleware), nameof(TMiddleware));
 
-            return new TaskHubMiddlewareDescriptor(typeof(TMiddleware), ServiceDescriptor.Singleton(factory));
+            return new TaskMiddlewareDescriptor(typeof(TMiddleware), ServiceDescriptor.Singleton(factory));
         }
 
         /// <summary>
@@ -81,12 +81,12 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="type">The concrete <see cref="ITaskHubMiddleware"/> type.</param>
         /// <returns>A descriptor for a transient taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Transient(Type type)
+        public static TaskMiddlewareDescriptor Transient(Type type)
         {
             Check.NotNull(type, nameof(type));
             Check.ConcreteType<ITaskHubMiddleware>(type, nameof(type));
 
-            return new TaskHubMiddlewareDescriptor(type, ServiceDescriptor.Transient(type, type));
+            return new TaskMiddlewareDescriptor(type, ServiceDescriptor.Transient(type, type));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <typeparam name="TMiddleware">The concrete <see cref="ITaskHubMiddleware"/> type.</typeparam>
         /// <returns>A descriptor for a transient taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Transient<TMiddleware>()
+        public static TaskMiddlewareDescriptor Transient<TMiddleware>()
             where TMiddleware : class, ITaskHubMiddleware
             => Transient(typeof(TMiddleware));
 
@@ -103,13 +103,13 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="factory">The factory to produce the transient middleware.</param>
         /// <returns>A descriptor for a transient taskhub middleware.</returns>
-        public static TaskHubMiddlewareDescriptor Transient<TMiddleware>(Func<IServiceProvider, TMiddleware> factory)
+        public static TaskMiddlewareDescriptor Transient<TMiddleware>(Func<IServiceProvider, TMiddleware> factory)
             where TMiddleware : class, ITaskHubMiddleware
         {
             Check.NotNull(factory, nameof(factory));
             Check.ConcreteType<ITaskHubMiddleware>(typeof(TMiddleware), nameof(TMiddleware));
 
-            return new TaskHubMiddlewareDescriptor(typeof(TMiddleware), ServiceDescriptor.Transient(factory));
+            return new TaskMiddlewareDescriptor(typeof(TMiddleware), ServiceDescriptor.Transient(factory));
         }
     }
 }

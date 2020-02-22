@@ -23,7 +23,7 @@ namespace DurableTask.DependencyInjection
     /// </summary>
     internal class TaskHubCollection : ITaskObjectCollection
     {
-        private readonly HashSet<TaskHubDescriptor> descriptors = new HashSet<TaskHubDescriptor>();
+        private readonly HashSet<NamedServiceDescriptorWrapper> descriptors = new HashSet<NamedServiceDescriptorWrapper>();
         private readonly ConcurrentDictionary<TaskVersion, Type> typeMap
             = new ConcurrentDictionary<TaskVersion, Type>();
 
@@ -34,7 +34,7 @@ namespace DurableTask.DependencyInjection
         public int Count => this.descriptors.Count;
 
         /// <inheritdoc />
-        public IEnumerator<TaskHubDescriptor> GetEnumerator() => this.descriptors.GetEnumerator();
+        public IEnumerator<NamedServiceDescriptorWrapper> GetEnumerator() => this.descriptors.GetEnumerator();
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
@@ -43,9 +43,9 @@ namespace DurableTask.DependencyInjection
         /// Adds the descriptor to this collection.
         /// </summary>
         /// <param name="descriptor">The descriptor to add.</param>
-        public bool Add(TaskHubDescriptor descriptor) => this.descriptors.Add(descriptor);
+        public bool Add(NamedServiceDescriptorWrapper descriptor) => this.descriptors.Add(descriptor);
 
-        private bool IsTaskMatch(string name, string version, TaskHubDescriptor descriptor)
+        private bool IsTaskMatch(string name, string version, NamedServiceDescriptorWrapper descriptor)
         {
             return string.Equals(name, descriptor.Name, StringComparison.Ordinal)
                 && string.Equals(version, descriptor.Version, StringComparison.Ordinal);
@@ -59,7 +59,7 @@ namespace DurableTask.DependencyInjection
                 return type;
             }
 
-            foreach (TaskHubDescriptor descriptor in descriptors)
+            foreach (NamedServiceDescriptorWrapper descriptor in descriptors)
             {
                 if (IsTaskMatch(name, version, descriptor))
                 {
