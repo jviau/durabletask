@@ -37,6 +37,7 @@ namespace DurableTask.DependencyInjection
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(descriptors, nameof(descriptors));
+
             this.serviceProvider = serviceProvider;
             this.descriptors = descriptors;
         }

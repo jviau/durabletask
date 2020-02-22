@@ -23,7 +23,8 @@ namespace DurableTask.DependencyInjection
     /// </summary>
     internal class TaskHubCollection : ITaskObjectCollection
     {
-        private readonly HashSet<NamedServiceDescriptorWrapper> descriptors = new HashSet<NamedServiceDescriptorWrapper>();
+        private readonly HashSet<NamedServiceDescriptorWrapper> descriptors
+            = new HashSet<NamedServiceDescriptorWrapper>();
         private readonly ConcurrentDictionary<TaskVersion, Type> typeMap
             = new ConcurrentDictionary<TaskVersion, Type>();
 

@@ -14,3 +14,4 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("DurableTask.DependencyInjection.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -84,7 +84,11 @@ namespace DurableTask.DependencyInjection
             return this;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Builds and returns a <see cref="TaskHubWorker"/> using the configurations from this instance.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <returns>A new <see cref="TaskHubWorker"/>.</returns>
         public TaskHubWorker Build(IServiceProvider serviceProvider)
         {
             var worker = new TaskHubWorker(
