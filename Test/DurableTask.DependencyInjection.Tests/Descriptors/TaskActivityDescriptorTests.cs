@@ -205,13 +205,8 @@ namespace DurableTask.DependencyInjection.Tests
         private void RunExceptionTest<TException>(Func<TaskActivityDescriptor> test)
             where TException : Exception
         {
-            try
-            {
-                TaskActivityDescriptor descriptor = test();
-            }
-            catch (TException)
-            {
-            }
+            TException exception = TestHelpers.Capture<TException>(() => test());
+            Assert.IsNotNull(exception);
         }
 
         private class TestActivity : TaskActivity

@@ -58,7 +58,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void SingleByInstanceNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskMiddlewareDescriptor.Singleton((ITaskHubMiddleware)null));
+                () => TaskMiddlewareDescriptor.Singleton((ITaskMiddleware)null));
 
         [TestMethod]
         public void SingletonByFactory()
@@ -69,7 +69,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void SingleByFactoryNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskMiddlewareDescriptor.Singleton((Func<IServiceProvider, ITaskHubMiddleware>)null));
+                () => TaskMiddlewareDescriptor.Singleton((Func<IServiceProvider, ITaskMiddleware>)null));
 
         [TestMethod]
         public void SingleByFactoryAbstract()
@@ -112,7 +112,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void TransientByFactoryNull()
             => RunExceptionTest<ArgumentNullException>(
-                () => TaskMiddlewareDescriptor.Transient((Func<IServiceProvider, ITaskHubMiddleware>)null));
+                () => TaskMiddlewareDescriptor.Transient((Func<IServiceProvider, ITaskMiddleware>)null));
 
         [TestMethod]
         public void TransientByFactoryAbstract()
@@ -132,20 +132,15 @@ namespace DurableTask.DependencyInjection.Tests
         private void RunExceptionTest<TException>(Func<TaskMiddlewareDescriptor> test)
             where TException : Exception
         {
-            try
-            {
-                TaskMiddlewareDescriptor descriptor = test();
-            }
-            catch (TException)
-            {
-            }
+            TException exception = TestHelpers.Capture<TException>(() => test());
+            Assert.IsNotNull(exception);
         }
 
         private class TestMiddleware : AbstractMiddleware
         {
         }
 
-        private abstract class AbstractMiddleware : ITaskHubMiddleware
+        private abstract class AbstractMiddleware : ITaskMiddleware
         {
             public Task InvokeAsync(DispatchMiddlewareContext context, Func<Task> next)
             {

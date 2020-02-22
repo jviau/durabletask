@@ -51,6 +51,8 @@ namespace DurableTask.DependencyInjection
         /// <inheritdoc />
         public ITaskHubWorkerBuilder AddActivity(TaskActivityDescriptor descriptor)
         {
+            Check.NotNull(descriptor, nameof(descriptor));
+
             this.Services.TryAdd(descriptor.Descriptor);
             this.activities.Add(descriptor);
             return this;
@@ -69,6 +71,8 @@ namespace DurableTask.DependencyInjection
         /// <inheritdoc />
         public ITaskHubWorkerBuilder AddOrchestration(TaskOrchestrationDescriptor descriptor)
         {
+            Check.NotNull(descriptor, nameof(descriptor));
+
             this.Services.TryAdd(descriptor.Descriptor);
             this.orchestrations.Add(descriptor);
             return this;
@@ -91,6 +95,13 @@ namespace DurableTask.DependencyInjection
         /// <returns>A new <see cref="TaskHubWorker"/>.</returns>
         public TaskHubWorker Build(IServiceProvider serviceProvider)
         {
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
+
+            if (this.OrchestrationService == null)
+            {
+                throw new InvalidOperationException("Builder is not fully configured yet. OrchestrationService is null.");
+            }
+
             var worker = new TaskHubWorker(
                 this.OrchestrationService,
                 new ServiceObjectManager<TaskOrchestration>(serviceProvider, this.orchestrations),
@@ -114,7 +125,7 @@ namespace DurableTask.DependencyInjection
         {
             return (context, next) =>
             {
-                var middleware = (ITaskHubMiddleware)serviceProvider.GetRequiredService(middlewareType);
+                var middleware = (ITaskMiddleware)serviceProvider.GetRequiredService(middlewareType);
                 return middleware.InvokeAsync(context, next);
             };
         }

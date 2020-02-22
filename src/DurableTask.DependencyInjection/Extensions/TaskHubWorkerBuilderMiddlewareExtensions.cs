@@ -27,7 +27,7 @@ namespace DurableTask.DependencyInjection
         /// <param name="middleware">The middleware instance to add.</param>
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseActivityMiddleware(
-            this ITaskHubWorkerBuilder builder, ITaskHubMiddleware middleware)
+            this ITaskHubWorkerBuilder builder, ITaskMiddleware middleware)
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Singleton(middleware));
@@ -40,7 +40,7 @@ namespace DurableTask.DependencyInjection
         /// <param name="builder">The builder to add to.</param>
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseActivityMiddleware<TMiddleware>(this ITaskHubWorkerBuilder builder)
-            where TMiddleware : class, ITaskHubMiddleware
+            where TMiddleware : class, ITaskMiddleware
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Transient<TMiddleware>());
@@ -55,7 +55,7 @@ namespace DurableTask.DependencyInjection
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseActivityMiddleware<TMiddleware>(
             this ITaskHubWorkerBuilder builder, Func<IServiceProvider, TMiddleware> factory)
-            where TMiddleware : class, ITaskHubMiddleware
+            where TMiddleware : class, ITaskMiddleware
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddActivityMiddleware(TaskMiddlewareDescriptor.Transient(factory));
@@ -68,7 +68,7 @@ namespace DurableTask.DependencyInjection
         /// <param name="middleware">The middleware instance to add.</param>
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseOrchestrationMiddleware(
-            this ITaskHubWorkerBuilder builder, ITaskHubMiddleware middleware)
+            this ITaskHubWorkerBuilder builder, ITaskMiddleware middleware)
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Singleton(middleware));
@@ -81,7 +81,7 @@ namespace DurableTask.DependencyInjection
         /// <param name="builder">The builder to add to.</param>
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseOrchestrationMiddleware<TMiddleware>(this ITaskHubWorkerBuilder builder)
-            where TMiddleware : class, ITaskHubMiddleware
+            where TMiddleware : class, ITaskMiddleware
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Transient<TMiddleware>());
@@ -96,7 +96,7 @@ namespace DurableTask.DependencyInjection
         /// <returns>The original builder, with middleware added.</returns>
         public static ITaskHubWorkerBuilder UseOrchestrationMiddleware<TMiddleware>(
             this ITaskHubWorkerBuilder builder, Func<IServiceProvider, TMiddleware> factory)
-            where TMiddleware : class, ITaskHubMiddleware
+            where TMiddleware : class, ITaskMiddleware
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddOrchestrationMiddleware(TaskMiddlewareDescriptor.Transient(factory));

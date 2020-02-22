@@ -17,6 +17,7 @@ namespace DurableTask.DependencyInjection.Tests
     using DurableTask.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using static TestHelpers;
 
     [TestClass]
     public class ServiceObjectManagerTests
@@ -80,21 +81,6 @@ namespace DurableTask.DependencyInjection.Tests
             // assert
             Assert.IsNotNull(actual);
             Assert.AreSame(obj, actual);
-        }
-
-        private static TException Capture<TException>(Action action)
-            where TException : Exception
-        {
-            try
-            {
-                action();
-            }
-            catch (TException ex)
-            {
-                return ex;
-            }
-
-            return null;
         }
 
         private class MyType

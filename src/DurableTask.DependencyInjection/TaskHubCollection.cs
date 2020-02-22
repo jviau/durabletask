@@ -29,13 +29,15 @@ namespace DurableTask.DependencyInjection
             = new ConcurrentDictionary<TaskVersion, Type>();
 
         /// <inheritdoc />
-        public Type this[string taskName, string taskVersion] => GetTaskType(taskName, taskVersion);
+        public Type this[string taskName, string taskVersion]
+            => GetTaskType(taskName, taskVersion);
 
         /// <inheritdoc />
         public int Count => this.descriptors.Count;
 
         /// <inheritdoc />
-        public IEnumerator<NamedServiceDescriptorWrapper> GetEnumerator() => this.descriptors.GetEnumerator();
+        public IEnumerator<NamedServiceDescriptorWrapper> GetEnumerator()
+            => this.descriptors.GetEnumerator();
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
@@ -44,9 +46,11 @@ namespace DurableTask.DependencyInjection
         /// Adds the descriptor to this collection.
         /// </summary>
         /// <param name="descriptor">The descriptor to add.</param>
-        public bool Add(NamedServiceDescriptorWrapper descriptor) => this.descriptors.Add(descriptor);
+        public bool Add(NamedServiceDescriptorWrapper descriptor)
+            => this.descriptors.Add(descriptor);
 
-        private bool IsTaskMatch(string name, string version, NamedServiceDescriptorWrapper descriptor)
+        private bool IsTaskMatch(
+            string name, string version, NamedServiceDescriptorWrapper descriptor)
         {
             return string.Equals(name, descriptor.Name, StringComparison.Ordinal)
                 && string.Equals(version, descriptor.Version, StringComparison.Ordinal);

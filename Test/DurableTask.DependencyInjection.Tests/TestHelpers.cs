@@ -11,23 +11,25 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.DependencyInjection
+namespace DurableTask.DependencyInjection.Tests
 {
     using System;
-    using System.Threading.Tasks;
-    using DurableTask.Core.Middleware;
 
-    /// <summary>
-    /// Middleware for running in the task hub worker pipeline.
-    /// </summary>
-    public interface ITaskHubMiddleware
+    public class TestHelpers
     {
-        /// <summary>
-        /// Task hub middleware handling method.
-        /// </summary>
-        /// <param name="context">The <see cref="DispatchMiddlewareContext"/> context for this pipeline.</param>
-        /// <param name="next">The delegate representing the remaining middleware in the pipeline.</param>
-        /// <returns>A <see cref="Task"/> that represents the execution of this middleware.</returns>
-        Task InvokeAsync(DispatchMiddlewareContext context, Func<Task> next);
+        public static TException Capture<TException>(Action action)
+            where TException : Exception
+        {
+            try
+            {
+                action();
+            }
+            catch (TException ex)
+            {
+                return ex;
+            }
+
+            return null;
+        }
     }
 }

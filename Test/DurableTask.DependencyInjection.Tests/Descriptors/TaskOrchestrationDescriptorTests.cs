@@ -206,13 +206,8 @@ namespace DurableTask.DependencyInjection.Tests
         private void RunExceptionTest<TException>(Func<TaskOrchestrationDescriptor> test)
             where TException : Exception
         {
-            try
-            {
-                TaskOrchestrationDescriptor descriptor = test();
-            }
-            catch (TException)
-            {
-            }
+            TException exception = TestHelpers.Capture<TException>(() => test());
+            Assert.IsNotNull(exception);
         }
 
         private class TestOrchestration : TaskOrchestration

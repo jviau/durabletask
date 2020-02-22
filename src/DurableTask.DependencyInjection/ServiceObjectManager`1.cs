@@ -32,8 +32,7 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="descriptors">The descriptors of <typeparamref name="TObject"/>.</param>
-        public ServiceObjectManager(
-            IServiceProvider serviceProvider, ITaskObjectCollection descriptors)
+        public ServiceObjectManager(IServiceProvider serviceProvider, ITaskObjectCollection descriptors)
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(descriptors, nameof(descriptors));
