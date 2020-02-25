@@ -68,11 +68,11 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Creates a new singleton <see cref="TaskActivityDescriptor"/>.
         /// </summary>
+        /// <param name="type">The type of the task.</param>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="type">The type of the task.</param>
         /// <returns>A new task hub descriptor.</returns>
-        public static TaskActivityDescriptor Singleton(string name, string version, Type type)
+        public static TaskActivityDescriptor Singleton(Type type, string name, string version)
         {
             TaskActivityDescriptor descriptor = Singleton(type);
             descriptor.Name = name;
@@ -89,16 +89,16 @@ namespace DurableTask.DependencyInjection
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Singleton<TActivity>(string name, string version)
             where TActivity : TaskActivity
-            => Singleton(name, version, typeof(TActivity));
+            => Singleton(typeof(TActivity), name, version);
 
         /// <summary>
         /// Creates a new singleton <see cref="TaskActivityDescriptor"/>.
         /// </summary>
+        /// <param name="instance">The task activity instance.</param>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="instance">The task activity instance.</param>
         /// <returns>A new task hub descriptor.</returns>
-        public static TaskActivityDescriptor Singleton(string name, string version, TaskActivity instance)
+        public static TaskActivityDescriptor Singleton(TaskActivity instance, string name, string version)
         {
             TaskActivityDescriptor descriptor = Singleton(instance);
             descriptor.Name = name;
@@ -122,12 +122,12 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Creates a new singleton <see cref="TaskActivityDescriptor"/>.
         /// </summary>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Singleton<TActivity>(
-            string name, string version, Func<IServiceProvider, TActivity> factory)
+            Func<IServiceProvider, TActivity> factory, string name, string version)
             where TActivity : TaskActivity
         {
             TaskActivityDescriptor descriptor = Singleton(factory);
@@ -160,11 +160,11 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Creates a new transient <see cref="TaskActivityDescriptor"/>.
         /// </summary>
+        /// <param name="type">The type of the task.</param>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="type">The type of the task.</param>
         /// <returns>A new task hub descriptor.</returns>
-        public static TaskActivityDescriptor Transient(string name, string version, Type type)
+        public static TaskActivityDescriptor Transient(Type type, string name, string version)
         {
             TaskActivityDescriptor descriptor = Transient(type);
             descriptor.Name = name;
@@ -181,7 +181,7 @@ namespace DurableTask.DependencyInjection
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Transient<TActivity>(string name, string version)
             where TActivity : TaskActivity
-            => Transient(name, version, typeof(TActivity));
+            => Transient(typeof(TActivity), name, version);
 
         /// <summary>
         /// Creates a new transient <see cref="TaskActivityDescriptor"/>.
@@ -199,12 +199,12 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Creates a new transient <see cref="TaskActivityDescriptor"/>.
         /// </summary>
+        /// <param name="factory">The delegate to create the task instance.</param>
         /// <param name="name">The name of the task.</param>
         /// <param name="version">The version of the task.</param>
-        /// <param name="factory">The delegate to create the task instance.</param>
         /// <returns>A new task hub descriptor.</returns>
         public static TaskActivityDescriptor Transient<TActivity>(
-            string name, string version, Func<IServiceProvider, TActivity> factory)
+            Func<IServiceProvider, TActivity> factory, string name, string version)
             where TActivity : TaskActivity
         {
             TaskActivityDescriptor descriptor = Transient(factory);

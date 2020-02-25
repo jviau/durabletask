@@ -49,12 +49,12 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void AddActivityTypeNamedNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, Name, Version, typeof(TestActivity)));
+                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, typeof(TestActivity), Name, Version));
 
         [TestMethod]
         public void AddActivityTypeNamedNullType()
             => RunTestException<ArgumentNullException>(
-                builder => builder.AddActivity(Name, Version, null));
+                builder => builder.AddActivity(null, Name, Version));
 
         [TestMethod]
         public void AddActivityGenericNamedNullBuilder()
@@ -64,7 +64,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void AddActivityFactoryNamedNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, Name, Version, __ => new TestActivity()));
+                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, __ => new TestActivity(), Name, Version));
 
         [TestMethod]
         public void AddActivityType()
@@ -105,12 +105,12 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void AddActivityTypeNamed()
             => RunTest(
-                builder => builder.AddActivity(Name, Version, typeof(TestActivity)),
+                builder => builder.AddActivity(typeof(TestActivity), Name, Version),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(Name, Version, typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
@@ -122,19 +122,19 @@ namespace DurableTask.DependencyInjection.Tests
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(Name, Version, typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
         public void AddActivityFactoryNamed()
             => RunTest(
-                builder => builder.AddActivity(Name, Version, _ => new TestActivity()),
+                builder => builder.AddActivity(_ => new TestActivity(), Name, Version),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(Name, Version, typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
@@ -177,7 +177,7 @@ namespace DurableTask.DependencyInjection.Tests
                     && descriptor.Descriptor.Lifetime == ServiceLifetime.Transient);
         }
 
-        private TaskActivityDescriptor IsDescriptor(string name, string version, Type type)
+        private TaskActivityDescriptor IsDescriptor(Type type, string name, string version)
         {
             return Match.Create<TaskActivityDescriptor>(
                 descriptor => descriptor.Name == name

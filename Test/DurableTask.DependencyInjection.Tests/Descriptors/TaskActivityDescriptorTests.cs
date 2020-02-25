@@ -33,7 +33,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void SingletonByTypeNamed()
             => RunTest<TestActivity>(
-                () => TaskActivityDescriptor.Singleton(Name, Version, typeof(TestActivity)),
+                () => TaskActivityDescriptor.Singleton(typeof(TestActivity), Name, Version),
                 Name,
                 Version,
                 ServiceLifetime.Singleton);
@@ -76,7 +76,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void SingletonByInstanceNamed()
             => RunTest<TestActivity>(
-                () => TaskActivityDescriptor.Singleton(Name, Version, new TestActivity()),
+                () => TaskActivityDescriptor.Singleton(new TestActivity(), Name, Version),
                 Name,
                 Version,
                 ServiceLifetime.Singleton);
@@ -95,7 +95,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void SingletonByFactoryNamed()
             => RunTest<TestActivity>(
-                () => TaskActivityDescriptor.Singleton(Name, Version, _ => new TestActivity()),
+                () => TaskActivityDescriptor.Singleton(_ => new TestActivity(), Name, Version),
                 Name,
                 Version,
                 ServiceLifetime.Singleton);
@@ -119,7 +119,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void TransientByTypeNamed()
             => RunTest<TestActivity>(
-                () => TaskActivityDescriptor.Transient(Name, Version, typeof(TestActivity)),
+                () => TaskActivityDescriptor.Transient(typeof(TestActivity), Name, Version),
                 Name,
                 Version,
                 ServiceLifetime.Transient);
@@ -162,7 +162,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void TransientByFactoryNamed()
             => RunTest<TestActivity>(
-                () => TaskActivityDescriptor.Transient(Name, Version, _ => new TestActivity()),
+                () => TaskActivityDescriptor.Transient(_ => new TestActivity(), Name, Version),
                 Name,
                 Version,
                 ServiceLifetime.Transient);
