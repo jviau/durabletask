@@ -53,6 +53,22 @@ namespace DurableTask.DependencyInjection
         /// Must be of type <see cref="TaskActivity"/>.
         /// </summary>
         /// <param name="builder">The builder to add to.</param>
+        /// <param name="creator">The delegate to create the task activity.</param>
+        /// <typeparam name="TActivity">The task activity type to add.</typeparam>
+        /// <returns>The original builder, with the activity type added.</returns>
+        public static ITaskHubWorkerBuilder AddActivity<TActivity>(
+            this ITaskHubWorkerBuilder builder, Func<IServiceProvider, TActivity> creator)
+            where TActivity : TaskActivity
+        {
+            Check.NotNull(builder, nameof(builder));
+            return builder.AddActivity(TaskActivityDescriptor.Transient(creator));
+        }
+
+        /// <summary>
+        /// Adds the supplied activity type to the builder as a transient service.
+        /// Must be of type <see cref="TaskActivity"/>.
+        /// </summary>
+        /// <param name="builder">The builder to add to.</param>
         /// <param name="name">The name of the task to add.</param>
         /// <param name="version">The version of the task to add.</param>
         /// <param name="type">The activity type to add.</param>
@@ -97,22 +113,6 @@ namespace DurableTask.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
             return builder.AddActivity(TaskActivityDescriptor.Transient(name, version, creator));
-        }
-
-        /// <summary>
-        /// Adds the supplied activity type to the builder as a transient service.
-        /// Must be of type <see cref="TaskActivity"/>.
-        /// </summary>
-        /// <param name="builder">The builder to add to.</param>
-        /// <param name="creator">The delegate to create the task activity.</param>
-        /// <typeparam name="TActivity">The task activity type to add.</typeparam>
-        /// <returns>The original builder, with the activity type added.</returns>
-        public static ITaskHubWorkerBuilder AddActivity<TActivity>(
-            this ITaskHubWorkerBuilder builder, Func<IServiceProvider, TActivity> creator)
-            where TActivity : TaskActivity
-        {
-            Check.NotNull(builder, nameof(builder));
-            return builder.AddActivity(TaskActivityDescriptor.Transient(creator));
         }
     }
 }
