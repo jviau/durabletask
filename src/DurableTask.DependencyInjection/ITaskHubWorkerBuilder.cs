@@ -43,7 +43,7 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="descriptor">The middleware descriptor to add.</param>
         /// <returns>This instance, for chaining calls</returns>
-        ITaskHubWorkerBuilder AddActivityMiddleware(TaskMiddlewareDescriptor descriptor);
+        ITaskHubWorkerBuilder UseActivityMiddleware(TaskMiddlewareDescriptor descriptor);
 
         /// <summary>
         /// Adds the provided descriptor to the builder.
@@ -57,7 +57,7 @@ namespace DurableTask.DependencyInjection
         /// </summary>
         /// <param name="descriptor">The middleware descriptor to add.</param>
         /// <returns>This instance, for chaining calls</returns>
-        ITaskHubWorkerBuilder AddOrchestrationMiddleware(TaskMiddlewareDescriptor descriptor);
+        ITaskHubWorkerBuilder UseOrchestrationMiddleware(TaskMiddlewareDescriptor descriptor);
 
     }
 }

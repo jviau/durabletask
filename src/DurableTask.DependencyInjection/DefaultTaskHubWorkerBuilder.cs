@@ -37,7 +37,8 @@ namespace DurableTask.DependencyInjection
         /// <param name="services">The current service collection, not null.</param>
         public DefaultTaskHubWorkerBuilder(IServiceCollection services)
         {
-            this.Services = services ?? throw new ArgumentNullException(nameof(services));
+            Check.NotNull(services, nameof(services));
+            this.Services = services;
         }
 
         /// <inheritdoc />
@@ -59,7 +60,7 @@ namespace DurableTask.DependencyInjection
         }
 
         /// <inheritdoc />
-        public ITaskHubWorkerBuilder AddActivityMiddleware(TaskMiddlewareDescriptor descriptor)
+        public ITaskHubWorkerBuilder UseActivityMiddleware(TaskMiddlewareDescriptor descriptor)
         {
             Check.NotNull(descriptor, nameof(descriptor));
 
@@ -79,7 +80,7 @@ namespace DurableTask.DependencyInjection
         }
 
         /// <inheritdoc />
-        public ITaskHubWorkerBuilder AddOrchestrationMiddleware(TaskMiddlewareDescriptor descriptor)
+        public ITaskHubWorkerBuilder UseOrchestrationMiddleware(TaskMiddlewareDescriptor descriptor)
         {
             Check.NotNull(descriptor, nameof(descriptor));
 

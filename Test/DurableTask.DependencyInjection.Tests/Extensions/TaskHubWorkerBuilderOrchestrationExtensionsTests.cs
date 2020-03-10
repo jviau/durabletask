@@ -14,6 +14,7 @@
 namespace DurableTask.DependencyInjection.Tests
 {
     using System;
+    using System.Threading.Tasks;
     using DurableTask.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,120 +22,120 @@ namespace DurableTask.DependencyInjection.Tests
     using static TestHelpers;
 
     [TestClass]
-    public class TaskHubWorkerBuilderActivityExtensionsTests
+    public class TaskHubWorkerBuilderOrchestrationExtensionsTests
     {
-        private const string Name = "TaskHubWorkerBuilderActivityExtensionsTests_Name";
-        private const string Version = "TaskHubWorkerBuilderActivityExtensionsTests_Version";
+        private const string Name = "TaskHubWorkerBuilderOrchestrationExtensionsTests_Name";
+        private const string Version = "TaskHubWorkerBuilderOrchestrationExtensionsTests_Version";
 
         [TestMethod]
-        public void AddActivityTypeNullBuilder()
+        public void AddOrchestrationTypeNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, typeof(TestActivity)));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration(null, typeof(TestOrchestration)));
 
         [TestMethod]
-        public void AddActivityTypeNullType()
+        public void AddOrchestrationTypeNullType()
             => RunTestException<ArgumentNullException>(
-                builder => builder.AddActivity((Type)null));
+                builder => builder.AddOrchestration((Type)null));
 
         [TestMethod]
-        public void AddActivityGenericNullBuilder()
+        public void AddOrchestrationGenericNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity<TestActivity>(null));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration<TestOrchestration>(null));
 
         [TestMethod]
-        public void AddActivityFactoryNullBuilder()
+        public void AddOrchestrationFactoryNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, __ => new TestActivity()));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration(null, __ => new TestOrchestration()));
 
         [TestMethod]
-        public void AddActivityTypeNamedNullBuilder()
+        public void AddOrchestrationTypeNamedNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, typeof(TestActivity), Name, Version));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration(null, typeof(TestOrchestration), Name, Version));
 
         [TestMethod]
-        public void AddActivityTypeNamedNullType()
+        public void AddOrchestrationTypeNamedNullType()
             => RunTestException<ArgumentNullException>(
-                builder => builder.AddActivity(null, Name, Version));
+                builder => builder.AddOrchestration(null, Name, Version));
 
         [TestMethod]
-        public void AddActivityGenericNamedNullBuilder()
+        public void AddOrchestrationGenericNamedNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity<TestActivity>(null, Name, Version));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration<TestOrchestration>(null, Name, Version));
 
         [TestMethod]
-        public void AddActivityFactoryNamedNullBuilder()
+        public void AddOrchestrationFactoryNamedNullBuilder()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubWorkerBuilderActivityExtensions.AddActivity(null, __ => new TestActivity(), Name, Version));
+                _ => TaskHubWorkerBuilderOrchestrationExtensions.AddOrchestration(null, __ => new TestOrchestration(), Name, Version));
 
         [TestMethod]
-        public void AddActivityType()
+        public void AddOrchestrationType()
             => RunTest(
-                builder => builder.AddActivity(typeof(TestActivity)),
+                builder => builder.AddOrchestration(typeof(TestOrchestration)),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration))), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
-        public void AddActivityGeneric()
+        public void AddOrchestrationGeneric()
             => RunTest(
-                builder => builder.AddActivity<TestActivity>(),
+                builder => builder.AddOrchestration<TestOrchestration>(),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration))), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
-        public void AddActivityFactory()
+        public void AddOrchestrationFactory()
             => RunTest(
-                builder => builder.AddActivity(_ => new TestActivity()),
+                builder => builder.AddOrchestration(_ => new TestOrchestration()),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity))), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration))), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
-        public void AddActivityTypeNamed()
+        public void AddOrchestrationTypeNamed()
             => RunTest(
-                builder => builder.AddActivity(typeof(TestActivity), Name, Version),
+                builder => builder.AddOrchestration(typeof(TestOrchestration), Name, Version),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
-        public void AddActivityGenericNamed()
+        public void AddOrchestrationGenericNamed()
             => RunTest(
-                builder => builder.AddActivity<TestActivity>(Name, Version),
+                builder => builder.AddOrchestration<TestOrchestration>(Name, Version),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
         [TestMethod]
-        public void AddActivityFactoryNamed()
+        public void AddOrchestrationFactoryNamed()
             => RunTest(
-                builder => builder.AddActivity(_ => new TestActivity(), Name, Version),
+                builder => builder.AddOrchestration(_ => new TestOrchestration(), Name, Version),
                 (mock, builder) =>
                 {
                     Assert.IsNotNull(builder);
                     Assert.AreSame(mock.Object, builder);
-                    mock.Verify(m => m.AddActivity(IsDescriptor(typeof(TestActivity), Name, Version)), Times.Once);
+                    mock.Verify(m => m.AddOrchestration(IsDescriptor(typeof(TestOrchestration), Name, Version)), Times.Once);
                     mock.VerifyNoOtherCalls();
                 });
 
@@ -156,27 +157,37 @@ namespace DurableTask.DependencyInjection.Tests
             Action<Mock<ITaskHubWorkerBuilder>, TResult> verify)
         {
             var mock = new Mock<ITaskHubWorkerBuilder>();
-            mock.Setup(m => m.AddActivity(It.IsAny<TaskActivityDescriptor>())).Returns(mock.Object);
+            mock.Setup(m => m.AddOrchestration(It.IsAny<TaskOrchestrationDescriptor>())).Returns(mock.Object);
 
             TResult result = act(mock.Object);
             verify?.Invoke(mock, result);
         }
 
-        private class TestActivity : TaskActivity
+        private class TestOrchestration : TaskOrchestration
         {
-            public override string Run(TaskContext context, string input)
+            public override Task<string> Execute(OrchestrationContext context, string input)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override string GetStatus()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void RaiseEvent(OrchestrationContext context, string name, string input)
             {
                 throw new NotImplementedException();
             }
         }
 
-        private TaskActivityDescriptor IsDescriptor(Type type)
-            => Match.Create<TaskActivityDescriptor>(
+        private TaskOrchestrationDescriptor IsDescriptor(Type type)
+            => Match.Create<TaskOrchestrationDescriptor>(
                 descriptor => descriptor.Type == type
                     && descriptor.Descriptor.Lifetime == ServiceLifetime.Transient);
 
-        private TaskActivityDescriptor IsDescriptor(Type type, string name, string version)
-            => Match.Create<TaskActivityDescriptor>(
+        private TaskOrchestrationDescriptor IsDescriptor(Type type, string name, string version)
+            => Match.Create<TaskOrchestrationDescriptor>(
                 descriptor => descriptor.Name == name
                     && descriptor.Version == version
                     && descriptor.Type == type

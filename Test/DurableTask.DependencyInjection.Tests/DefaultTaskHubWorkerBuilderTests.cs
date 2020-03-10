@@ -23,7 +23,7 @@ namespace DurableTask.DependencyInjection.Tests
     using static TestHelpers;
 
     [TestClass]
-    public class TaskHubWorkerBuilderTests
+    public class DefaultTaskHubWorkerBuilderTests
     {
         [TestMethod]
         public void CtorArgumentNull()
@@ -35,7 +35,7 @@ namespace DurableTask.DependencyInjection.Tests
 
         [TestMethod]
         public void AddActivityMiddlewareNull()
-            => RunTestException<ArgumentNullException>(b => b.AddActivityMiddleware(null));
+            => RunTestException<ArgumentNullException>(b => b.UseActivityMiddleware(null));
 
         [TestMethod]
         public void AddOrchestrationNull()
@@ -43,7 +43,7 @@ namespace DurableTask.DependencyInjection.Tests
 
         [TestMethod]
         public void AddOrchestrationMiddlewareNull()
-            => RunTestException<ArgumentNullException>(b => b.AddOrchestrationMiddleware(null));
+            => RunTestException<ArgumentNullException>(b => b.UseOrchestrationMiddleware(null));
 
         [TestMethod]
         public void BuildNullServiceProvider()
@@ -69,7 +69,7 @@ namespace DurableTask.DependencyInjection.Tests
             TaskMiddlewareDescriptor descriptor = TaskMiddlewareDescriptor.Singleton<TestMiddleware>();
             RunTest(
                 null,
-                b => b.AddActivityMiddleware(descriptor),
+                b => b.UseActivityMiddleware(descriptor),
                 (_, services) => Assert.IsTrue(services.Contains(descriptor.Descriptor)));
         }
 
@@ -89,7 +89,7 @@ namespace DurableTask.DependencyInjection.Tests
             TaskMiddlewareDescriptor descriptor = TaskMiddlewareDescriptor.Singleton<TestMiddleware>();
             RunTest(
                 null,
-                b => b.AddOrchestrationMiddleware(descriptor),
+                b => b.UseOrchestrationMiddleware(descriptor),
                 (_, services) => Assert.IsTrue(services.Contains(descriptor.Descriptor)));
         }
 
