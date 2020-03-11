@@ -13,7 +13,9 @@
 
 namespace DurableTask.DependencyInjection
 {
+    using System;
     using DurableTask.Core;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
 
     /// <summary>
     /// Extensions for <see cref="ITaskHubWorkerBuilder"/>.
@@ -23,15 +25,44 @@ namespace DurableTask.DependencyInjection
         /// <summary>
         /// Sets the provided <paramref name="orchestrationService"/> to the 
         /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="orchestrationService"></param>
-        /// <returns></returns>
+        /// <param name="builder">The task hub builder.</param>
+        /// <param name="orchestrationService">The orchestration service to use.</param>
+        /// <returns>The original builder, with orchestration service set.</returns>
         public static ITaskHubWorkerBuilder WithOrchestrationService(
             this ITaskHubWorkerBuilder builder, IOrchestrationService orchestrationService)
         {
             Check.NotNull(builder, nameof(builder));
             builder.OrchestrationService = orchestrationService;
             return builder;
+        }
+
+        /// <summary>
+        /// Adds <see cref="TaskHubClient"/> to the service collection.
+        /// </summary>
+        /// <param name="builder">The builder to add the client from.</param>
+        /// <returns>The original builder, with <see cref="TaskHubClient"/> added to the service collection.</returns>
+        public static ITaskHubWorkerBuilder AddClient(this ITaskHubWorkerBuilder builder)
+        {
+            Check.NotNull(builder, nameof(builder));
+            builder.Services.TryAddSingleton(_ => ClientFactory(builder));
+            return builder;
+        }
+
+        private static TaskHubClient ClientFactory(ITaskHubWorkerBuilder builder)
+        {
+            if (builder.OrchestrationService == null)
+            {
+                throw new InvalidOperationException($"OrchestrationService not set on ITaskHubWorkerBuilder.");
+            }
+
+            if (builder.OrchestrationService is IOrchestrationServiceClient client)
+            {
+                return new TaskHubClient(client);
+            }
+
+            throw new InvalidOperationException(
+                $"Failed to add TaskHubClient. " +
+                $"{builder.OrchestrationService.GetType()} does not implement {typeof(IOrchestrationServiceClient)}.");
         }
     }
 }

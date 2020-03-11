@@ -16,26 +16,13 @@ namespace DurableTask.DependencyInjection
     using System;
     using DurableTask.Core;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
 
     /// <summary>
     /// Extension methods for adding task hub services to a service collection.
     /// </summary>
     public static class TaskHubServiceCollectionExtensions
     {
-        /// <summary>
-        /// Adds a <see cref="TaskHubWorker"/> and related services to the service collection.
-        /// </summary>
-        /// <param name="services">The service collection to add to.</param>
-        /// <returns>A builder for adding task hub related services to.</returns>
-        public static ITaskHubWorkerBuilder AddTaskHubWorker(this IServiceCollection services)
-        {
-            Check.NotNull(services, nameof(services));
-
-            var builder = new DefaultTaskHubWorkerBuilder(services);
-            services.AddSingleton(sp => builder.Build(sp));
-            return builder;
-        }
-
         /// <summary>
         /// Adds a <see cref="TaskHubWorker"/> and related services to the service collection.
         /// </summary>
@@ -48,7 +35,10 @@ namespace DurableTask.DependencyInjection
             Check.NotNull(services, nameof(services));
             Check.NotNull(configure, nameof(configure));
 
-            configure(services.AddTaskHubWorker());
+            var builder = new DefaultTaskHubWorkerBuilder(services);
+            configure(builder);
+            services.TryAddSingleton(sp => builder.Build(sp));
+
             return services;
         }
     }

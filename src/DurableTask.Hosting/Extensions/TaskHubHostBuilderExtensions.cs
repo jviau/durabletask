@@ -17,6 +17,7 @@ namespace DurableTask.Hosting
     using DurableTask.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Options;
 
     /// <summary>
     /// Extensions for configuring a task hub worker service on <see cref="IHostBuilder"/>.
@@ -45,9 +46,8 @@ namespace DurableTask.Hosting
         {
             builder.ConfigureServices((context, services) =>
             {
-                ITaskHubWorkerBuilder taskHubBuilder = services.AddTaskHubWorker();
+                services.AddTaskHubWorker(taskHubBuilder => configure(context, taskHubBuilder));
                 services.AddHostedService<TaskHubBackgroundService>();
-                configure(context, taskHubBuilder);
             });
 
             return builder;

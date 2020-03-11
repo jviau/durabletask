@@ -42,11 +42,9 @@ namespace DurableTask.Samples.DependencyInjection
                     //IOrchestrationService orchestrationService = UseServiceBus(context.Configuration);
                     IOrchestrationService orchestrationService = UseLocalEmulator();
 
-                    builder.OrchestrationService = orchestrationService;
+                    builder.WithOrchestrationService(orchestrationService);
 
-                    // TODO: add a .AddClient(bool add) method to the builder.
-                    builder.Services.AddSingleton(new TaskHubClient(orchestrationService as IOrchestrationServiceClient));
-
+                    builder.AddClient();
                     builder.AddOrchestration<GreetingsOrchestration>();
                     builder
                         .AddActivity<GetUserTask>()

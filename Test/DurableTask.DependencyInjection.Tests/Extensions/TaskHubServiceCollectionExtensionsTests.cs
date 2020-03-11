@@ -25,28 +25,7 @@ namespace DurableTask.DependencyInjection.Tests
         [TestMethod]
         public void AddTaskHubWorkerNull()
             => RunTestException<ArgumentNullException>(
-                _ => TaskHubServiceCollectionExtensions.AddTaskHubWorker(null));
-
-        [TestMethod]
-        public void AddTaskHubWorkerNull2()
-            => RunTestException<ArgumentNullException>(
                 services => TaskHubServiceCollectionExtensions.AddTaskHubWorker(services, null));
-
-        [TestMethod]
-        public void AddTaskHubWorker()
-            => RunTest(
-                null,
-                services => services.AddTaskHubWorker(),
-                (services, builder) =>
-                {
-                    Assert.IsNotNull(builder);
-                    Assert.AreSame(services, builder.Services);
-                    Assert.AreEqual(1, services.Count);
-
-                    ServiceDescriptor descriptor = services.First();
-                    Assert.AreEqual(ServiceLifetime.Singleton, descriptor.Lifetime);
-                    Assert.IsNotNull(descriptor.ImplementationFactory);
-                });
 
         [TestMethod]
         public void AddTaskHubWorkerFunc()
