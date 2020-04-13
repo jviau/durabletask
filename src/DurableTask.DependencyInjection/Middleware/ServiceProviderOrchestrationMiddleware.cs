@@ -11,53 +11,47 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-namespace DurableTask.DependencyInjection
+namespace DurableTask.DependencyInjection.Middleware
 {
-
     using System;
+    using System.Threading.Tasks;
     using DurableTask.Core;
+    using DurableTask.Core.Middleware;
+    using DurableTask.DependencyInjection.Orchestrations;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// An object manager that gets its items via the service provider.
+    /// Middleware that constructs and injects the real orchestration or activity at the necessary time.
     /// </summary>
-    /// <typeparam name="TObject"></typeparam>
-    internal class ServiceObjectManager<TObject> : INameVersionObjectManager<TObject>
+    public class ServiceProviderOrchestrationMiddleware : ITaskMiddleware
     {
         private readonly IServiceProvider serviceProvider;
-        private readonly ITaskObjectCollection descriptors;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ServiceObjectManager{TObject}"/>.
+        /// A middleware that lazily sets the inner orchestration to be ran.
         /// </summary>
-        /// <param name="serviceProvider">The service provider.</param>
-        /// <param name="descriptors">The descriptors of <typeparamref name="TObject"/>.</param>
-        public ServiceObjectManager(IServiceProvider serviceProvider, ITaskObjectCollection descriptors)
+        /// <param name="serviceProvider">The service provider. Not null.</param>
+        public ServiceProviderOrchestrationMiddleware(IServiceProvider serviceProvider)
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
-            Check.NotNull(descriptors, nameof(descriptors));
-
             this.serviceProvider = serviceProvider;
-            this.descriptors = descriptors;
         }
 
         /// <inheritdoc />
-        public void Add(ObjectCreator<TObject> creator)
+        public async Task InvokeAsync(DispatchMiddlewareContext context, Func<Task> next)
         {
-            throw new NotSupportedException();
-        }
+            TaskOrchestration taskOrchestration = context.GetProperty<TaskOrchestration>();
 
-        /// <inheritdoc />
-        public TObject GetObject(string name, string version)
-        {
-            Type type = this.descriptors[name, version];
-
-            if (type == null)
+            if (taskOrchestration is WrapperOrchestration wrapper)
             {
-                return default;
+                wrapper.InnerOrchestration = (TaskOrchestration)this.serviceProvider
+                    .GetRequiredService(wrapper.InnerOrchestrationType);
+
+                await next();
+                return;
             }
 
-            return (TObject)this.serviceProvider.GetRequiredService(type);
+            await next();
         }
     }
 }

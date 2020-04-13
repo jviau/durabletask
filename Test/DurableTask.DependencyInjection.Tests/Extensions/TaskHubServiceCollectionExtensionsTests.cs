@@ -40,9 +40,9 @@ namespace DurableTask.DependencyInjection.Tests
                 {
                     Assert.IsNotNull(returned);
                     Assert.AreSame(original, returned);
-                    Assert.AreEqual(1, original.Count);
+                    Assert.AreEqual(3, original.Count);
 
-                    ServiceDescriptor descriptor = original.First();
+                    ServiceDescriptor descriptor = original.Last();
                     Assert.AreEqual(ServiceLifetime.Singleton, descriptor.Lifetime);
                     Assert.IsNotNull(descriptor.ImplementationFactory);
                 });

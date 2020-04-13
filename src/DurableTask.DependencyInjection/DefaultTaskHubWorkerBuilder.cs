@@ -18,6 +18,9 @@ namespace DurableTask.DependencyInjection
     using System.Threading.Tasks;
     using DurableTask.Core;
     using DurableTask.Core.Middleware;
+    using DurableTask.DependencyInjection.Activities;
+    using DurableTask.DependencyInjection.Middleware;
+    using DurableTask.DependencyInjection.Orchestrations;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -39,6 +42,8 @@ namespace DurableTask.DependencyInjection
         {
             Check.NotNull(services, nameof(services));
             this.Services = services;
+            this.Services.AddScoped<ServiceProviderOrchestrationMiddleware>();
+            this.Services.AddScoped<ServiceProviderActivityMiddleware>();
         }
 
         /// <inheritdoc />
@@ -105,28 +110,41 @@ namespace DurableTask.DependencyInjection
 
             var worker = new TaskHubWorker(
                 this.OrchestrationService,
-                new ServiceObjectManager<TaskOrchestration>(serviceProvider, this.orchestrations),
-                new ServiceObjectManager<TaskActivity>(serviceProvider, this.activities));
+                new WrapperObjectManager<TaskOrchestration>(this.orchestrations, type => new WrapperOrchestration(type)),
+                new WrapperObjectManager<TaskActivity>(this.activities, type => new WrapperActivity(type)));
 
-            foreach (Type middlewareType in this.activitiesMiddleware)
-            {
-                worker.AddActivityDispatcherMiddleware(WrapMiddleware(serviceProvider, middlewareType));
-            }
-
+            // The first middleware added begins the service scope for all further middleware, the orchestration, and activities.
+            worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(typeof(ServiceProviderOrchestrationMiddleware), serviceProvider));
             foreach (Type middlewareType in this.orchestrationsMiddleware)
             {
-                worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(serviceProvider, middlewareType));
+                worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(middlewareType));
+            }
+
+            worker.AddActivityDispatcherMiddleware(WrapMiddleware(typeof(ServiceProviderActivityMiddleware)));
+            foreach (Type middlewareType in this.activitiesMiddleware)
+            {
+                worker.AddActivityDispatcherMiddleware(WrapMiddleware(middlewareType));
             }
 
             return worker;
         }
 
-        private static Func<DispatchMiddlewareContext, Func<Task>, Task> WrapMiddleware(
-            IServiceProvider serviceProvider, Type middlewareType)
+        private static Func<DispatchMiddlewareContext, Func<Task>, Task> WrapMiddleware(Type middlewareType)
         {
             return (context, next) =>
             {
-                var middleware = (ITaskMiddleware)serviceProvider.GetRequiredService(middlewareType);
+                IServiceScope scope = OrchestrationScope.GetScope(context.GetProperty<OrchestrationInstance>());
+                var middleware = (ITaskMiddleware)scope.ServiceProvider.GetRequiredService(middlewareType);
+                return middleware.InvokeAsync(context, next);
+            };
+        }
+
+        private static Func<DispatchMiddlewareContext, Func<Task>, Task> WrapMiddleware(Type middlewareType, IServiceProvider serviceProvider)
+        {
+            return (context, next) =>
+            {
+                IServiceScope scope = OrchestrationScope.CreateScope(context.GetProperty<OrchestrationInstance>(), serviceProvider);
+                var middleware = (ITaskMiddleware)scope.ServiceProvider.GetRequiredService(middlewareType);
                 return middleware.InvokeAsync(context, next);
             };
         }

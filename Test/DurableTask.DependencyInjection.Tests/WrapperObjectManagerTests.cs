@@ -27,7 +27,7 @@ namespace DurableTask.DependencyInjection.Tests
         {
             // arrange, act
             ArgumentNullException ex = Capture<ArgumentNullException>(
-                () => new ServiceObjectManager<object>(null, Mock.Of<ITaskObjectCollection>()));
+                () => new WrapperObjectManager<object>(null, _ => null));
 
             // assert
             Assert.IsNotNull(ex);
@@ -38,7 +38,7 @@ namespace DurableTask.DependencyInjection.Tests
         {
             // arrange, act
             ArgumentNullException ex = Capture<ArgumentNullException>(
-                () => new ServiceObjectManager<object>(Mock.Of<IServiceProvider>(), null));
+                () => new WrapperObjectManager<object>(Mock.Of<ITaskObjectCollection>(), null));
 
             // assert
             Assert.IsNotNull(ex);
@@ -48,8 +48,8 @@ namespace DurableTask.DependencyInjection.Tests
         public void AddNotSupported()
         {
             // arrange
-            var manager = new ServiceObjectManager<object>(
-                Mock.Of<IServiceProvider>(), Mock.Of<ITaskObjectCollection>());
+            var manager = new WrapperObjectManager<object>(
+                Mock.Of<ITaskObjectCollection>(), _ => new object());
 
             // act
             NotSupportedException ex = Capture<NotSupportedException>(
@@ -60,31 +60,38 @@ namespace DurableTask.DependencyInjection.Tests
         }
 
         [TestMethod]
-        public void GetUsesServiceProvider()
+        public void GetUsesFactory()
         {
             // arrange
-            string name = "ServiceObjectManagerTests_Name";
-            string version = "ServiceObjectManagerTests_Version";
-            var obj = new MyType();
+            string name = "WrapperObjectManagerTests_Name";
+            string version = "WrapperObjectManagerTests_Version";
 
             var descriptors = new Mock<ITaskObjectCollection>();
             descriptors.Setup(x => x[name, version]).Returns(typeof(MyType));
 
-            var serviceProvider = new Mock<IServiceProvider>();
-            serviceProvider.Setup(x => x.GetService(typeof(MyType))).Returns(obj);
-
-            var manager = new ServiceObjectManager<MyType>(serviceProvider.Object, descriptors.Object);
+            var manager = new WrapperObjectManager<MyType>(descriptors.Object, t => new MyTypeWrapped(t));
 
             // act
             MyType actual = manager.GetObject(name, version);
+            var wrapper = actual as MyTypeWrapped;
 
             // assert
-            Assert.IsNotNull(actual);
-            Assert.AreSame(obj, actual);
+            Assert.IsNotNull(wrapper);
+            Assert.AreEqual(typeof(MyType), wrapper.Type);
         }
 
         private class MyType
         {
+        }
+
+        private class MyTypeWrapped : MyType
+        {
+            public MyTypeWrapped(Type t)
+            {
+                Type = t;
+            }
+
+            public Type Type { get; }
         }
     }
 }
