@@ -47,6 +47,8 @@ namespace DurableTask.DependencyInjection.Middleware
                 wrapper.InnerActivity = (TaskActivity)this.serviceProvider
                     .GetRequiredService(wrapper.InnerActivityType);
 
+                // update the context task activity with the real one.
+                context.SetProperty(wrapper.InnerActivity);
                 await next();
                 return;
             }

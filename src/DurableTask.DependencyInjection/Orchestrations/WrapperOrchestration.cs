@@ -52,11 +52,12 @@ namespace DurableTask.DependencyInjection.Orchestrations
 
             try
             {
-                return await this.InnerOrchestration.Execute(context, input);
+                return await this.InnerOrchestration.Execute(context, input).ConfigureAwait(false);
             }
             finally
             {
-                OrchestrationScope.DisposeScope(context.OrchestrationInstance);
+                await OrchestrationScope.SafeDisposeScopeAsync(context.OrchestrationInstance)
+                    .ConfigureAwait(false);
             }
         }
 

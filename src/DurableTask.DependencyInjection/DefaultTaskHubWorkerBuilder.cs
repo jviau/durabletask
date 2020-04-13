@@ -114,7 +114,9 @@ namespace DurableTask.DependencyInjection
                 new WrapperObjectManager<TaskActivity>(this.activities, type => new WrapperActivity(type)));
 
             // The first middleware added begins the service scope for all further middleware, the orchestration, and activities.
-            worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(typeof(ServiceProviderOrchestrationMiddleware), serviceProvider));
+
+            worker.AddOrchestrationDispatcherMiddleware(BeginMiddlewareScope(serviceProvider));
+            worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(typeof(ServiceProviderOrchestrationMiddleware)));
             foreach (Type middlewareType in this.orchestrationsMiddleware)
             {
                 worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(middlewareType));
@@ -139,13 +141,20 @@ namespace DurableTask.DependencyInjection
             };
         }
 
-        private static Func<DispatchMiddlewareContext, Func<Task>, Task> WrapMiddleware(Type middlewareType, IServiceProvider serviceProvider)
+        private static Func<DispatchMiddlewareContext, Func<Task>, Task> BeginMiddlewareScope(IServiceProvider serviceProvider)
         {
-            return (context, next) =>
+            return async (context, next) =>
             {
-                IServiceScope scope = OrchestrationScope.CreateScope(context.GetProperty<OrchestrationInstance>(), serviceProvider);
-                var middleware = (ITaskMiddleware)scope.ServiceProvider.GetRequiredService(middlewareType);
-                return middleware.InvokeAsync(context, next);
+                IOrchestrationScope scope = null;
+                try
+                {
+                    scope = OrchestrationScope.CreateScope(context.GetProperty<OrchestrationInstance>(), serviceProvider);
+                    await next().ConfigureAwait(false);
+                }
+                finally
+                {
+                    scope?.SignalMiddlewareCompletion();
+                }
             };
         }
     }

@@ -47,6 +47,8 @@ namespace DurableTask.DependencyInjection.Middleware
                 wrapper.InnerOrchestration = (TaskOrchestration)this.serviceProvider
                     .GetRequiredService(wrapper.InnerOrchestrationType);
 
+                // update the context task orchestration with the real one.
+                context.SetProperty(wrapper.InnerOrchestration);
                 await next();
                 return;
             }

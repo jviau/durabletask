@@ -15,23 +15,35 @@ namespace DurableTask.DependencyInjection
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using DurableTask.Core;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Holds the <see cref="IServiceScope"/> per orchestration instance execution.
     /// </summary>
-    internal static class OrchestrationScope
+    internal class OrchestrationScope : IOrchestrationScope
     {
-        private static readonly IDictionary<OrchestrationInstance, IServiceScope> scopes
-            = new Dictionary<OrchestrationInstance, IServiceScope>();
+        private static readonly IDictionary<OrchestrationInstance, IOrchestrationScope> scopes
+            = new Dictionary<OrchestrationInstance, IOrchestrationScope>();
+
+        private readonly IServiceScope innerScope;
+        private readonly TaskCompletionSource<bool> middlewareCompleted
+            = new TaskCompletionSource<bool>();
+
+        private OrchestrationScope(IServiceScope scope)
+        {
+            this.innerScope = Check.NotNull(scope, nameof(scope));
+        }
+
+        public IServiceProvider ServiceProvider => this.innerScope.ServiceProvider;
 
         /// <summary>
         /// Gets the current scope for the orchestration instance. Throws if not found.
         /// </summary>
         /// <param name="orchestrationInstance">The orchestration instance. Not null.</param>
-        /// <returns>A non-null <see cref="IServiceScope"/>.</returns>
-        public static IServiceScope GetScope(OrchestrationInstance orchestrationInstance)
+        /// <returns>A non-null <see cref="IOrchestrationScope"/>.</returns>
+        public static IOrchestrationScope GetScope(OrchestrationInstance orchestrationInstance)
         {
             Check.NotNull(orchestrationInstance, nameof(orchestrationInstance));
             lock (scopes)
@@ -41,12 +53,13 @@ namespace DurableTask.DependencyInjection
         }
 
         /// <summary>
-        /// Creates a new <see cref="IServiceScope"/> for the orchestration instance.
+        /// Creates a new <see cref="IOrchestrationScope"/> for the orchestration instance.
         /// </summary>
         /// <param name="orchestrationInstance">The orchestration instance. Not null.</param>
         /// <param name="serviceProvider">The service provider. Not null.</param>
         /// <returns></returns>
-        public static IServiceScope CreateScope(OrchestrationInstance orchestrationInstance, IServiceProvider serviceProvider)
+        public static IOrchestrationScope CreateScope(
+            OrchestrationInstance orchestrationInstance, IServiceProvider serviceProvider)
         {
             Check.NotNull(orchestrationInstance, nameof(orchestrationInstance));
             Check.NotNull(serviceProvider, nameof(serviceProvider));
@@ -55,25 +68,28 @@ namespace DurableTask.DependencyInjection
             {
                 if (scopes.ContainsKey(orchestrationInstance))
                 {
-                    throw new InvalidOperationException($"Scope already exists for orchestration {orchestrationInstance.InstanceId}");
+                    throw new InvalidOperationException(
+                        $"Scope already exists for orchestration {orchestrationInstance.InstanceId}");
                 }
 
 
-                IServiceScope scope = serviceProvider.CreateScope();
+                IOrchestrationScope scope = new OrchestrationScope(serviceProvider.CreateScope());
                 scopes[orchestrationInstance] = scope;
                 return scope;
             }
         }
 
         /// <summary>
-        /// Disposes the <see cref="IServiceScope"/> for the provided orchestration instance, if found.
+        /// Waits for middleware completion then disposes the <see cref="IOrchestrationScope"/>
+        /// for the provided orchestration instance, if found.
         /// </summary>
         /// <param name="orchestrationInstance">The orchestration instance, not null.</param>
-        public static void DisposeScope(OrchestrationInstance orchestrationInstance)
+        /// <returns>A task that completes when the orchestration scope is disposed.</returns>
+        public static async Task SafeDisposeScopeAsync(OrchestrationInstance orchestrationInstance)
         {
             Check.NotNull(orchestrationInstance, nameof(orchestrationInstance));
 
-            IServiceScope scope;
+            IOrchestrationScope scope;
             lock (scopes)
             {
                 if (scopes.TryGetValue(orchestrationInstance, out scope))
@@ -84,7 +100,25 @@ namespace DurableTask.DependencyInjection
 
             if (scope != null)
             {
+                await scope.WaitForMiddlewareCompletionAsync().ConfigureAwait(false);
                 scope.Dispose();
+            }
+        }
+
+        /// <inheritdoc />
+        public void SignalMiddlewareCompletion() => this.middlewareCompleted.TrySetResult(true);
+
+        /// <inheritdoc />
+        public Task WaitForMiddlewareCompletionAsync() => this.middlewareCompleted.Task;
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            this.innerScope.Dispose();
+
+            if (!this.middlewareCompleted.Task.IsCompleted)
+            {
+                this.middlewareCompleted.TrySetCanceled();
             }
         }
     }
