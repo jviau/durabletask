@@ -115,7 +115,7 @@ namespace DurableTask.DependencyInjection
 
             foreach (Type middlewareType in this.orchestrationsMiddleware)
             {
-                worker.AddActivityDispatcherMiddleware(WrapMiddleware(serviceProvider, middlewareType));
+                worker.AddOrchestrationDispatcherMiddleware(WrapMiddleware(serviceProvider, middlewareType));
             }
 
             return worker;
